@@ -53,13 +53,20 @@ module Spree
     end
 
     def order_activatable?(order)
+      # if expiry set and less than today
+      is_valid = true
+      if !expires_at.nil? && expires_at <= DateTime.now - 1.days
+        is_valid = false
+      end
+
+
       order &&
       created_at < order.created_at &&
       current_value > 0 &&
-      !UNACTIVATABLE_ORDER_STATES.include?(order.state)
+      !UNACTIVATABLE_ORDER_STATES.include?(order.state) &&
+      is_valid
     end
 
-    public
     def self.total_liability
       sum(:liability)
     end
