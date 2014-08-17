@@ -56,10 +56,19 @@ module Spree
       order &&
       created_at < order.created_at &&
       current_value > 0 &&
-      !UNACTIVATABLE_ORDER_STATES.include?(order.state)
+      !UNACTIVATABLE_ORDER_STATES.include?(order.state) &&
+      !expired?
     end
 
-    public
+    def expired?
+      # if expires_at not set, consider the coupon not expired
+      if expires_at.nil?
+        return false
+      else
+        return DateTime.now > (expires_at + 1.days)
+      end
+    end
+
     def self.total_liability
       sum(:liability)
     end
